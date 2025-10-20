@@ -1,0 +1,130 @@
+body {
+  width: 400px;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.container {
+  padding: 16px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 12px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.subtitle {
+  margin: 4px 0 0 0;
+  color: #7f8c8d;
+  font-size: 12px;
+}
+
+.problem-info {
+  background-color: #e8f4fd;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.problem-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.problem-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #34495e;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  flex: 1;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #7f8c8d;
+}
+
+.hint-container, .tutorial-container {
+  background-color: white;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.hint-container h3, .tutorial-container h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.hint-content {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #34495e;
+  margin-bottom: 12px;
+}
+
+.hint-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.footer {
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.footer a {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none;
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AlgoMind</h1>
+      <p class="subtitle">Your coding companion</p>
+    </div>
+    
+    <div id="problem-info" class="problem-info hidden">
+      <h3>Current Problem:</h3>
+      <p id="problem-title">Loading...</p>
+    </div>
+    
+    <div class="controls">
+      <button id="get-hint" class="btn btn-primary">Get Hint</button>
+      <button id="reset-hints" class="btn btn-secondary">Reset Hints</button>
+    </div>
+    
+    <div id="hint-container" class="hint-container hidden">
+      <h3>Hint <span id="hint-level">1</span>/3:</h3>
+      <div id="hint-content" class="hint-content">
+        <!-- Hint will appear here -->
+      </div>
+      <div class="hint-actions">
+        <button id="next-hint" class="btn btn-primary">Next Hint</button>
+        <button id="show-tutorial" class="btn btn-secondary hidden">Show Tutorial</button>
+      </div>
+    </div>
+    
+    <div id="tutorial-container" class="tutorial-container hidden">
+      <h3>Video Tutorial:</h3>
+      <div id="tutorial-content">
+        <!-- YouTube video will appear here -->
+      </div>
+    </div>
+    
+    <div class="footer">
+      <a href="#" id="settings-link">Settings</a>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

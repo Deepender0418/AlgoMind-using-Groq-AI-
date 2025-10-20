@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "AlgoMind",
+  "version": "1.0",
+  "description": "Get hints for coding problems without spoilers",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.groq.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AlgoMind"
+  },
+  "content_scripts": [
+  {
+    "matches": [
+      "https://leetcode.com/*",
+      "https://*.leetcode.com/*",
+      "https://geeksforgeeks.org/*",
+      "https://*.geeksforgeeks.org/*",
+      "https://hackerrank.com/*",
+      "https://*.hackerrank.com/*",
+      "https://codeforces.com/*",
+      "https://*.codeforces.com/*",
+      "https://coderbyte.com/*",
+      "https://*.coderbyte.com/*",
+      "https://codewars.com/*",
+      "https://*.codewars.com/*"
+    ],
+    "js": ["content.js"]
+  }
+  ],  
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
