@@ -83,95 +83,105 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to get hint from Groq API
   function getHint(level) {
-    // Show loading state
     hintContent.textContent = 'Loading hint...';
     hintContainer.classList.remove('hidden');
     hintLevel.textContent = level;
     
-    // Get API key from storage
     chrome.storage.sync.get(['groqApiKey'], function(data) {
-      if (!data.groqApiKey) {
-        hintContent.textContent = 'Please set your Groq API key in the settings';
-        chrome.runtime.openOptionsPage();
-        return;
-      }
-      
-      // Prepare the prompt based on hint level
-      let prompt = '';
-      switch(level) {
-        case 1:
-          prompt = `Provide a subtle hint for the following coding problem without giving away the solution. Focus on the general approach or strategy: ${currentProblem}`;
-          break;
-        case 2:
-          prompt = `Provide a more direct hint for the following coding problem without giving the full solution. Suggest a specific data structure or algorithm that might be useful: ${currentProblem}`;
-          break;
-        case 3:
-          prompt = `Provide a strong hint for the following coding problem that gives a nudge in the right direction but still doesn't reveal the complete solution. Mention key steps or considerations: ${currentProblem}`;
-          break;
-      }
-      
-      // Call Groq API
-      fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${data.groqApiKey}`
-        },
-        body: JSON.stringify({
-          model: 'llama3-8b-8192',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful coding assistant that provides hints for programming problems. You should guide the user toward the solution without giving it away directly. Your hints should be progressive, starting with subtle suggestions and becoming more direct in later stages.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 500
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.choices && data.choices[0]) {
-          const hint = data.choices[0].message.content;
-          hintContent.textContent = hint;
-          currentHintLevel = level;
-          
-          // Save hint to storage
-          chrome.storage.local.get(['hintLevels', 'currentHints'], function(storageData) {
-            const hintLevels = storageData.hintLevels || {};
-            const currentHints = storageData.currentHints || {};
-            
-            hintLevels[currentProblem] = level;
-            currentHints[currentProblem] = hint;
-            
-            chrome.storage.local.set({
-              hintLevels: hintLevels,
-              currentHints: currentHints
-            });
-          });
-          
-          // Show/hide buttons based on hint level
-          if (level < 3) {
-            nextHintBtn.classList.remove('hidden');
-            showTutorialBtn.classList.add('hidden');
-          } else {
-            nextHintBtn.classList.add('hidden');
-            showTutorialBtn.classList.remove('hidden');
-          }
-        } else {
-          hintContent.textContent = 'Error getting hint. Please try again.';
+        if (!data.groqApiKey) {
+            hintContent.textContent = 'Please set your Groq API key in settings';
+            chrome.runtime.openOptionsPage();
+            return;
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        hintContent.textContent = 'Error getting hint. Please check your API key and try again.';
-      });
+        
+        let prompt = '';
+        switch(level) {
+            case 1:
+                prompt = `Provide a subtle hint for coding problem "${currentProblem}" without giving solution. Focus on general approach.`;
+                break;
+            case 2:
+                prompt = `Provide a direct hint for "${currentProblem}" suggesting specific data structures/algorithms but not the full solution.`;
+                break;
+            case 3:
+                prompt = `Provide a strong hint for "${currentProblem}" with key steps but don't reveal complete solution.`;
+                break;
+        }
+
+        fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.groqApiKey}`
+            },
+            body: JSON.stringify({
+                model: 'llama-3.1-8b-instant',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You provide progressive hints for coding problems. Be helpful but never give direct solutions.'
+                    },
+                    {
+                        role: 'user', 
+                        content: prompt
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 300
+            })
+        })
+        .then(response => {
+            if (response.status === 429) {
+                throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+            }
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.choices?.[0]?.message?.content) {
+                const hint = data.choices[0].message.content;
+                hintContent.textContent = hint;
+                currentHintLevel = level;
+                
+                // Save to storage
+                chrome.storage.local.get(['hintLevels', 'currentHints'], function(storageData) {
+                    const hintLevels = storageData.hintLevels || {};
+                    const currentHints = storageData.currentHints || {};
+                    
+                    hintLevels[currentProblem] = level;
+                    currentHints[currentProblem] = hint;
+                    
+                    chrome.storage.local.set({
+                        hintLevels: hintLevels,
+                        currentHints: currentHints
+                    });
+                });
+                
+                // Update UI
+                if (level < 3) {
+                    nextHintBtn.classList.remove('hidden');
+                    showTutorialBtn.classList.add('hidden');
+                } else {
+                    nextHintBtn.classList.add('hidden');
+                    showTutorialBtn.classList.remove('hidden');
+                }
+            } else {
+                throw new Error('No hint content in response');
+            }
+        })
+        .catch(error => {
+            console.error('API Error:', error);
+            if (error.message.includes('Rate limit')) {
+                hintContent.textContent = 'Rate limit exceeded. Please wait a minute and try again.';
+            } else if (error.message.includes('API error: 401')) {
+                hintContent.textContent = 'Invalid API key. Please check your settings.';
+            } else {
+                hintContent.textContent = `Error: ${error.message}. Please try again.`;
+            }
+        });
     });
-  }
+}
 
   // Function to show existing hint
   function showHint(hint) {
