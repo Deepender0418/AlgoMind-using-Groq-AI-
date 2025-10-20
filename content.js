@@ -13,58 +13,67 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function extractProblem() {
   const url = window.location.href;
   let problem = '';
-  
+
   // LeetCode
   if (url.includes('leetcode.com')) {
-    const titleElement = document.querySelector('[data-cy="question-title"]');
+    const titleElement = document.querySelector('[data-cy="question_title"]') || document.querySelector('[data-cy="question-title"]');
     if (titleElement) {
-      problem = titleElement.textContent || '';
-    }
-    
-    // Alternative selectors for LeetCode
-    if (!problem) {
-      const altTitle = document.querySelector('.css-v3d350');
-      if (altTitle) {
-        problem = altTitle.textContent || '';
-      }
+      problem = titleElement.textContent.trim() || '';
     }
   }
-  
+
   // GeeksforGeeks
   else if (url.includes('geeksforgeeks.org')) {
-    const titleElement = document.querySelector('.problem-statement h1');
+    const titleElement = document.querySelector('.problem-statement h1') || document.querySelector('#problemTitle') || document.querySelector('.problem-header');
     if (titleElement) {
-      problem = titleElement.textContent || '';
+      problem = titleElement.textContent.trim() || '';
     }
   }
-  
+
   // HackerRank
   else if (url.includes('hackerrank.com')) {
-    const titleElement = document.querySelector('.ui-icon-label.page-label');
+    const titleElement = document.querySelector('.challenge-headline') || document.querySelector('.ui-icon-label.page-label') || document.querySelector('#problem-title');
     if (titleElement) {
-      problem = titleElement.textContent || '';
+      problem = titleElement.textContent.trim() || '';
     }
   }
-  
+
   // Codeforces
   else if (url.includes('codeforces.com')) {
-    const titleElement = document.querySelector('.problem-statement .title');
+    const titleElement = document.querySelector('.problem-statement .title') || document.querySelector('.problem-statement h1');
     if (titleElement) {
-      problem = titleElement.textContent || '';
+      problem = titleElement.textContent.trim() || '';
     }
   }
-  
-  // Generic fallback - try to find any h1 that might contain the problem title
-  if (!problem) {
-    const h1Elements = document.querySelectorAll('h1');
-    for (let h1 of h1Elements) {
-      const text = h1.textContent.trim();
-      if (text && text.length < 100) { // Reasonable title length
-        problem = text;
-        break;
-      }
+
+  // Coderbyte
+  else if (url.includes('coderbyte.com')) {
+    const titleElement = document.querySelector('.challenge-title') || document.querySelector('h1');
+    if (titleElement) {
+      problem = titleElement.textContent.trim() || '';
     }
   }
-  
+
+  // Codewars
+  else if (url.includes('codewars.com')) {
+    const titleElement = document.querySelector('.ml-2') || document.querySelector('.kata-info h4') || document.querySelector('.challenge-title');
+    if (titleElement) {
+      problem = titleElement.textContent.trim() || '';
+    }
+  }
+
+  // Generic fallback - try to find page title without site name
+  if (!problem || problem === 'Unknown Problem') {
+    const pageTitle = document.title;
+    const separatorIndex = pageTitle.indexOf(' - ') || pageTitle.indexOf(' | ') || pageTitle.indexOf(' · ');
+    if (separatorIndex > 0) {
+      problem = pageTitle.substring(0, separatorIndex).trim();
+    } else {
+      problem = pageTitle.trim();
+    }
+    // Validate length
+    if (problem.length > 100 || !problem) problem = 'Unknown Problem';
+  }
+
   return problem || 'Unknown Problem';
 }
